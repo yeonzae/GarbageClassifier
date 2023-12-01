@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Classifier</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-light">
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} text-center">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main content -->
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Upload Image for Classification</h1>
+        <div class="d-flex justify-content-center">
+            <video id="video" width="640" height="480" autoplay class="border"></video>
+        </div>
+        <div class="text-center my-3">
+            <button id="snap" class="btn btn-primary">Capture</button>
+        </div>
+        <canvas id="canvas" width="640" height="480" class="d-none"></canvas>
+
+        <form action="/upload" method="post" enctype="multipart/form-data" class="text-center mt-3">
+            <input type="hidden" name="image_data" id="image_data">
+            <input type="submit" value="Upload" class="btn btn-success">
+        </form>
+    </div>
+
+    <!-- JavaScript for camera functionality -->
+    <script>
+        // Get access to the camera
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+            });
+        }
+
+        // Elements for taking the snapshot
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        var video = document.getElementById('video');
+
+        // Trigger photo take
+
+        document.getElementById("snap").addEventListener("click", function() {
+            context.drawImage(video, 0, 0, 640, 480);
+            var dataURL = canvas.toDataURL('image/jpeg');
+            document.getElementById('image_data').value = dataURL;
+            canvas.classList.remove('d-none'); // Make canvas visible
+        });
+    </script>
+</body>
+</html>
